@@ -19,4 +19,7 @@ public class RegisterRequest {
     private String password;
 
     private Role role;
+
+    private String restaurantname;
+    private String location;
 }

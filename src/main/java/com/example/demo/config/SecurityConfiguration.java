@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.auth.LogoutService;
 import com.example.demo.user.Permissions;
 import com.example.demo.user.Role;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,8 +23,11 @@ public class SecurityConfiguration {
 
     private final JwtAuthenticationFliter jwtAuthenticationFliter;
     private final AuthenticationProvider authenticationProvider;
+
+    private final LogoutService logoutService;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
 
 //        httpSecurity.csrf().disable().authorizeHttpRequests().requestMatchers("/api/v1/auth/**").permitAll().
 //        httpSecurity.csrf().disable().authorizeRequests().requestMatchers("/api/v1/auth/**").permitAll()
@@ -34,11 +39,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/management/**").hasAuthority(Permissions.MANAGER_READ.name())
                         .anyRequest().authenticated()).sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-        .addFilterBefore(jwtAuthenticationFliter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthenticationFliter, UsernamePasswordAuthenticationFilter.class).logout(logout->logout.logoutUrl("/logout")
+                        .addLogoutHandler(logoutService).logoutSuccessHandler((request,response,authentication)-> SecurityContextHolder.clearContext()));
         return  httpSecurity.build();
     }
-
-
-
-
 }

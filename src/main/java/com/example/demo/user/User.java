@@ -1,5 +1,7 @@
 package com.example.demo.user;
 
+import com.example.demo.restaurant.Restaurant;
+import com.example.demo.token.Token;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +31,12 @@ public class User implements UserDetails {
     private String lastName;
 
     private String email;
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER,cascade = {CascadeType.REFRESH},orphanRemoval = true)
+    private List<Token> tokens;
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER,cascade = {CascadeType.REFRESH},orphanRemoval = true)
+    private  List<Restaurant> restaurants;
 
+    private String restaurantName;
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
